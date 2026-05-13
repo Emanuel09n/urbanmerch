@@ -15,7 +15,7 @@ export default function Producto() {
   const [agregado, setAgregado] = useState(false)
 
   useEffect(() => {
-    axios.get(`http://localhost:3002/api/productos/${id}/detalle`)
+    axios.get(`https://urbanmerch-production.up.railway.app/api/productos/${id}/detalle`)
       .then(res => {
         setProducto(res.data)
         setLoading(false)

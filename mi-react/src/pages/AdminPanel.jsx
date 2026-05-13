@@ -37,10 +37,10 @@ export default function Admin() {
   const cargarDatos = async () => {
     try {
       const [prods, cats, anal, cups] = await Promise.all([
-        axios.get('http://localhost:3002/api/productos'),
-        axios.get('http://localhost:3002/api/categorias'),
-        axios.get('http://localhost:3002/api/analytics'),
-        axios.get('http://localhost:3002/api/cupones'),
+        axios.get('https://urbanmerch-production.up.railway.app/api/productos'),
+        axios.get('https://urbanmerch-production.up.railway.app/api/categorias'),
+        axios.get('https://urbanmerch-production.up.railway.app/api/analytics'),
+        axios.get('https://urbanmerch-production.up.railway.app/api/cupones'),
       ])
       setProductos(prods.data)
       setCategorias(cats.data)
@@ -68,8 +68,8 @@ export default function Admin() {
 
   const guardarProducto = async () => {
     try {
-      if (productoEdit) await axios.put(`http://localhost:3002/api/productos/${productoEdit.id}`, form)
-      else await axios.post('http://localhost:3002/api/productos', form)
+      if (productoEdit) await axios.put(`https://urbanmerch-production.up.railway.app/api/productos/${productoEdit.id}`, form)
+      else await axios.post('https://urbanmerch-production.up.railway.app/api/productos', form)
       setModalProducto(false)
       cargarDatos()
     } catch (err) { alert('Error guardando producto') }
@@ -78,14 +78,14 @@ export default function Admin() {
   const eliminarProducto = async (id) => {
     if (!window.confirm('¿Eliminar este producto?')) return
     try {
-      await axios.delete(`http://localhost:3002/api/productos/${id}`)
+      await axios.delete(`https://urbanmerch-production.up.railway.app/api/productos/${id}`)
       cargarDatos()
     } catch (err) { alert('Error eliminando producto') }
   }
 
   const guardarCupon = async () => {
     try {
-      await axios.post('http://localhost:3002/api/cupones', formCupon)
+      await axios.post('https://urbanmerch-production.up.railway.app/api/cupones', formCupon)
       setModalCupon(false)
       setFormCupon({ codigo: '', tipo: 'porcentaje', valor: '', minimo: '', usos_max: '100', expira: '' })
       cargarDatos()
@@ -95,7 +95,7 @@ export default function Admin() {
   const eliminarCupon = async (id) => {
     if (!window.confirm('¿Eliminar este cupón?')) return
     try {
-      await axios.delete(`http://localhost:3002/api/cupones/${id}`)
+      await axios.delete(`https://urbanmerch-production.up.railway.app/api/cupones/${id}`)
       cargarDatos()
     } catch (err) { alert('Error eliminando cupón') }
   }

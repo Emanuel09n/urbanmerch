@@ -13,7 +13,7 @@ export default function Registro() {
     setLoading(true)
     setError('')
     try {
-      await axios.post('http://localhost:3002/api/auth/registro', form)
+      await axios.post('https://urbanmerch-production.up.railway.app/api/auth/registro', form)
       navigate('/login')
     } catch (err) {
       setError('Este email ya está registrado')

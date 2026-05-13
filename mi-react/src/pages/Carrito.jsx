@@ -23,7 +23,7 @@ export default function Carrito() {
     setCuponError('')
     setCuponAplicado(null)
     try {
-      const res = await axios.post('http://localhost:3002/api/cupones/validar', {
+      const res = await axios.post('https://urbanmerch-production.up.railway.app/api/cupones/validar', {
         codigo: cupon, total
       })
       setCuponAplicado(res.data.cupon)
@@ -38,9 +38,9 @@ export default function Carrito() {
     try {
       // Usar cupón si hay uno
       if (cuponAplicado) {
-        await axios.post('http://localhost:3002/api/cupones/usar', { codigo: cuponAplicado.codigo })
+        await axios.post('https://urbanmerch-production.up.railway.app/api/cupones/usar', { codigo: cuponAplicado.codigo })
       }
-      const res = await axios.post('http://localhost:3002/api/pagos/crear-preferencia', {
+      const res = await axios.post('https://urbanmerch-production.up.railway.app/api/pagos/crear-preferencia', {
         productos: carrito.map(p => ({
           id: p.id, nombre: p.nombre,
           cantidad: p.cantidad, precio: p.precio

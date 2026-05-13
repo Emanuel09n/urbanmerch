@@ -15,7 +15,7 @@ export default function Login() {
     setLoading(true)
     setError('')
     try {
-      const res = await axios.post('http://localhost:3002/api/auth/login', form)
+      const res = await axios.post('https://urbanmerch-production.up.railway.app/api/auth/login', form)
       login(res.data.usuario, res.data.token)
       navigate('/')
     } catch (err) {

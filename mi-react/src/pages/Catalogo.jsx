@@ -27,7 +27,7 @@ export default function Catalogo() {
 
   useEffect(() => {
     setLoading(true)
-    let url = 'http://localhost:3002/api/productos'
+    let url = 'https://urbanmerch-production.up.railway.app/api/productos'
     if (seccion === 'hombre') url += '?genero=hombre'
     else if (seccion === 'mujer') url += '?genero=mujer'
     else if (seccion === 'sale') url += '?sale=true'
