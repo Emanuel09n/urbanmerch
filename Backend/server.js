@@ -22,6 +22,7 @@ app.use('/api/categorias', require('./routes/categorias'))
 app.use('/api/emails', require('./routes/emails'))
 app.use('/api/cupones', require('./routes/cupones'))
 app.use('/api/analytics', require('./routes/analytics'))
+app.use('/api/pagos', require('./routes/pagos'))
 
 app.get('/', (req, res) => {
   res.json({ mensaje: 'Servidor tienda de ropa ✅' })

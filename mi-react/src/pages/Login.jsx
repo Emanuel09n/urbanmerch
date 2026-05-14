@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
+import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi'
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' })
@@ -26,96 +27,168 @@ export default function Login() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#f5f5f5',
+      minHeight: '100vh', background: '#0a0a0a',
       display: 'flex', alignItems: 'center',
-      justifyContent: 'center', paddingTop: '70px'
+      justifyContent: 'center', padding: '90px 16px 40px',
+      position: 'relative', overflow: 'hidden'
     }}>
+      {/* FONDO DECORATIVO */}
       <div style={{
-        background: '#fff', borderRadius: '20px',
-        padding: '60px', width: '100%', maxWidth: '440px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.08)'
+        position: 'absolute', top: '-200px', right: '-200px',
+        width: '600px', height: '600px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)',
+        borderRadius: '50%', pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-100px', left: '-100px',
+        width: '400px', height: '400px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+        borderRadius: '50%', pointerEvents: 'none'
+      }} />
+
+      <div style={{
+        width: '100%', maxWidth: '420px',
+        position: 'relative', zIndex: 2
       }}>
-        <h1 style={{
-          fontSize: '32px', fontWeight: '800',
-          marginBottom: '8px', letterSpacing: '-1px'
-        }}>Bienvenido</h1>
-        <p style={{ color: '#888', marginBottom: '40px', fontSize: '14px' }}>
-          Ingresa a tu cuenta URBANMERCH
-        </p>
+        {/* LOGO */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <img src="/logo.png" alt="URBANMERCH"
+            style={{ height: '56px', objectFit: 'contain', filter: 'brightness(10)', marginBottom: '20px' }} />
+          <p style={{ fontSize: '11px', letterSpacing: '4px', color: '#555', textTransform: 'uppercase' }}>
+            Iniciar sesión
+          </p>
+        </div>
 
-        {error && (
-          <div style={{
-            background: '#fff0f0', border: '1px solid #ffcccc',
-            borderRadius: '8px', padding: '12px 16px',
-            color: '#cc0000', fontSize: '13px', marginBottom: '24px'
-          }}>{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              fontSize: '12px', fontWeight: '600',
-              letterSpacing: '1px', textTransform: 'uppercase',
-              color: '#333', display: 'block', marginBottom: '8px'
-            }}>Email</label>
-            <input
-              type="email" required
-              placeholder="tu@email.com"
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              style={{
-                width: '100%', padding: '14px 16px',
-                border: '1.5px solid #e0e0e0', borderRadius: '10px',
-                fontSize: '15px', outline: 'none',
-                transition: 'border 0.2s'
-              }}
-              onFocus={e => e.target.style.borderColor = '#000'}
-              onBlur={e => e.target.style.borderColor = '#e0e0e0'}
-            />
-          </div>
-
-          <div style={{ marginBottom: '32px' }}>
-            <label style={{
-              fontSize: '12px', fontWeight: '600',
-              letterSpacing: '1px', textTransform: 'uppercase',
-              color: '#333', display: 'block', marginBottom: '8px'
-            }}>Contraseña</label>
-            <input
-              type="password" required
-              placeholder="••••••••"
-              value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              style={{
-                width: '100%', padding: '14px 16px',
-                border: '1.5px solid #e0e0e0', borderRadius: '10px',
-                fontSize: '15px', outline: 'none',
-                transition: 'border 0.2s'
-              }}
-              onFocus={e => e.target.style.borderColor = '#000'}
-              onBlur={e => e.target.style.borderColor = '#e0e0e0'}
-            />
-          </div>
-
-          <button type="submit" disabled={loading} style={{
-            width: '100%', padding: '16px',
-            background: loading ? '#ccc' : '#0a0a0a',
-            color: '#fff', fontSize: '14px',
-            fontWeight: '700', letterSpacing: '2px',
-            textTransform: 'uppercase', borderRadius: '10px',
-            transition: 'all 0.3s'
-          }}>
-            {loading ? 'Ingresando...' : 'Ingresar'}
-          </button>
-        </form>
-
-        <p style={{
-          textAlign: 'center', marginTop: '24px',
-          fontSize: '14px', color: '#888'
+        {/* CARD */}
+        <div style={{
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '24px', padding: '40px 36px',
+          backdropFilter: 'blur(20px)'
         }}>
-          ¿No tienes cuenta?{' '}
-          <Link to="/registro" style={{ color: '#000', fontWeight: '600' }}>
-            Regístrate
-          </Link>
+          <h1 style={{
+            fontSize: '28px', fontWeight: '900', color: '#fff',
+            letterSpacing: '-1px', marginBottom: '8px'
+          }}>Bienvenido</h1>
+          <p style={{ color: '#555', fontSize: '14px', marginBottom: '32px' }}>
+            Ingresa a tu cuenta URBANMERCH
+          </p>
+
+          {error && (
+            <div style={{
+              background: 'rgba(204,0,0,0.15)', border: '1px solid rgba(204,0,0,0.3)',
+              borderRadius: '10px', padding: '12px 16px',
+              color: '#ff6666', fontSize: '13px', marginBottom: '20px'
+            }}>{error}</div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            {/* EMAIL */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                fontSize: '11px', fontWeight: '600', letterSpacing: '1px',
+                textTransform: 'uppercase', color: '#666', display: 'block', marginBottom: '8px'
+              }}>Email</label>
+              <div style={{ position: 'relative' }}>
+                <FiMail style={{
+                  position: 'absolute', left: '16px', top: '50%',
+                  transform: 'translateY(-50%)', color: '#555', fontSize: '16px'
+                }} />
+                <input type="email" required placeholder="tu@email.com"
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  style={{
+                    width: '100%', padding: '14px 16px 14px 48px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px', fontSize: '15px',
+                    outline: 'none', color: '#fff',
+                    transition: 'all 0.2s', boxSizing: 'border-box',
+                    fontFamily: 'inherit'
+                  }}
+                  onFocus={e => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.3)'
+                    e.target.style.background = 'rgba(255,255,255,0.09)'
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.1)'
+                    e.target.style.background = 'rgba(255,255,255,0.06)'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* CONTRASEÑA */}
+            <div style={{ marginBottom: '28px' }}>
+              <label style={{
+                fontSize: '11px', fontWeight: '600', letterSpacing: '1px',
+                textTransform: 'uppercase', color: '#666', display: 'block', marginBottom: '8px'
+              }}>Contraseña</label>
+              <div style={{ position: 'relative' }}>
+                <FiLock style={{
+                  position: 'absolute', left: '16px', top: '50%',
+                  transform: 'translateY(-50%)', color: '#555', fontSize: '16px'
+                }} />
+                <input type="password" required placeholder="••••••••"
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  style={{
+                    width: '100%', padding: '14px 16px 14px 48px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px', fontSize: '15px',
+                    outline: 'none', color: '#fff',
+                    transition: 'all 0.2s', boxSizing: 'border-box',
+                    fontFamily: 'inherit'
+                  }}
+                  onFocus={e => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.3)'
+                    e.target.style.background = 'rgba(255,255,255,0.09)'
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.1)'
+                    e.target.style.background = 'rgba(255,255,255,0.06)'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* BOTÓN */}
+            <button type="submit" disabled={loading} style={{
+              width: '100%', padding: '16px',
+              background: loading ? '#333' : '#fff',
+              color: '#000', fontSize: '13px', fontWeight: '800',
+              letterSpacing: '2px', textTransform: 'uppercase',
+              borderRadius: '12px', transition: 'all 0.3s',
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'center', gap: '8px'
+            }}
+              onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#e0e0e0' }}
+              onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#fff' }}>
+              {loading ? 'Ingresando...' : <><span>Ingresar</span> <FiArrowRight size={16} /></>}
+            </button>
+          </form>
+
+          {/* DIVISOR */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            margin: '24px 0'
+          }}>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+            <span style={{ color: '#555', fontSize: '12px' }}>o</span>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+          </div>
+
+          <p style={{ textAlign: 'center', fontSize: '14px', color: '#555' }}>
+            ¿No tienes cuenta?{' '}
+            <Link to="/registro" style={{ color: '#fff', fontWeight: '700', textDecoration: 'none' }}>
+              Regístrate gratis
+            </Link>
+          </p>
+        </div>
+
+        <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '12px', color: '#333' }}>
+          © 2025 URBANMERCH. Todos los derechos reservados.
         </p>
       </div>
     </div>
