@@ -24,7 +24,6 @@ router.post('/crear-preferencia', async (req, res) => {
       currency_id: 'COP'
     }))
 
-    // Si hay descuento lo agregamos como item negativo
     if (descuento && descuento > 0) {
       items.push({
         id: 'descuento',
@@ -66,7 +65,7 @@ router.post('/crear-preferencia', async (req, res) => {
   }
 })
 
-// WEBHOOK — Mercado Pago llama aquí cuando el pago es aprobado
+// WEBHOOK
 router.post('/webhook', async (req, res) => {
   const { type, data } = req.body
 
@@ -82,20 +81,34 @@ router.post('/webhook', async (req, res) => {
         const total = metadata.total || 0
         const productos = JSON.parse(metadata.productos || '[]')
 
-        // Crear pedido en la base de datos
-        if (email) {
+        if (email && productos.length > 0) {
           db.query('SELECT id FROM usuarios WHERE email = ?', [email], (err, users) => {
             if (!err && users.length > 0) {
               const usuario_id = users[0].id
+
               db.query('INSERT INTO pedidos (usuario_id, total, estado) VALUES (?, ?, ?)',
                 [usuario_id, total, 'pagado'], (err2, result) => {
-                  if (!err2 && productos.length > 0) {
+                  if (!err2) {
                     const pedido_id = result.insertId
                     const detalles = productos.map(p => [pedido_id, p.id, p.cantidad, p.precio])
+
+                    // GUARDAR DETALLE DEL PEDIDO
                     db.query('INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES ?',
                       [detalles], () => {})
 
-                    // Email de confirmación
+                    // REDUCIR INVENTARIO
+                    productos.forEach(p => {
+                      db.query(
+                        'UPDATE productos SET stock = GREATEST(stock - ?, 0) WHERE id = ?',
+                        [p.cantidad, p.id],
+                        (errStock) => {
+                          if (errStock) console.error('Error reduciendo stock:', errStock)
+                          else console.log(`Stock reducido: producto ${p.id} - ${p.cantidad} unidades`)
+                        }
+                      )
+                    })
+
+                    // EMAIL DE CONFIRMACIÓN
                     const itemsHtml = productos.map(p => `
                       <tr>
                         <td style="padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:14px;color:#333">${p.nombre}</td>
