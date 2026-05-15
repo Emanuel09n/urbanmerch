@@ -55,7 +55,6 @@ router.post('/crear-preferencia', async (req, res) => {
 
         auto_return: 'approved',
 
-        // WEBHOOK
         notification_url:
           'https://urbanmerch-production.up.railway.app/api/pagos/webhook',
 
@@ -71,9 +70,7 @@ router.post('/crear-preferencia', async (req, res) => {
     })
 
     res.json({
-      init_point: process.env.MP_ACCESS_TOKEN.startsWith('TEST-')
-        ? response.sandbox_init_point
-        : response.init_point,
+      init_point: response.init_point,
       id: response.id
     })
   } catch (err) {
@@ -120,24 +117,19 @@ router.post('/webhook', async (req, res) => {
                         p.precio
                       ])
 
-                      // GUARDAR DETALLE DEL PEDIDO
                       db.query(
                         'INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES ?',
                         [detalles],
                         () => {}
                       )
 
-                      // REDUCIR INVENTARIO
                       productos.forEach(p => {
                         db.query(
                           'UPDATE productos SET stock = GREATEST(stock - ?, 0) WHERE id = ?',
                           [p.cantidad, p.id],
                           errStock => {
                             if (errStock) {
-                              console.error(
-                                'Error reduciendo stock:',
-                                errStock
-                              )
+                              console.error('Error reduciendo stock:', errStock)
                             } else {
                               console.log(
                                 `Stock reducido: producto ${p.id} - ${p.cantidad} unidades`
@@ -147,7 +139,6 @@ router.post('/webhook', async (req, res) => {
                         )
                       })
 
-                      // EMAIL DE CONFIRMACIÓN
                       const itemsHtml = productos
                         .map(
                           p => `
