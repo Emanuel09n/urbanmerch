@@ -9,6 +9,7 @@ export default function Catalogo() {
   const [busqueda, setBusqueda] = useState('')
   const [loading, setLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [agregadoId, setAgregadoId] = useState(null)
   const { agregar } = useCart()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -228,18 +229,28 @@ export default function Catalogo() {
                       ${Number(producto.precio).toLocaleString('es-CO')}
                     </span>
                     <button
-                      onClick={e => { e.stopPropagation(); agregar(producto) }}
+                      onClick={e => {
+                        e.stopPropagation()
+                        agregar(producto)
+                        setAgregadoId(producto.id)
+                        setTimeout(() => setAgregadoId(null), 2000)
+                      }}
                       style={{
-                        background: '#0a0a0a', color: '#fff',
+                        background: agregadoId === producto.id ? '#00aa00' : '#0a0a0a',
+                        color: '#fff',
                         padding: isMobile ? '8px 10px' : '12px 20px',
                         borderRadius: '8px',
                         fontSize: isMobile ? '11px' : '13px',
                         fontWeight: '600',
                         display: 'flex', alignItems: 'center',
-                        gap: isMobile ? '4px' : '8px'
+                        gap: isMobile ? '4px' : '8px',
+                        transition: 'all 0.3s'
                       }}>
                       <FiShoppingBag size={isMobile ? 13 : 16} />
-                      {!isMobile && 'Agregar'}
+                      {isMobile
+                        ? agregadoId === producto.id ? '✓' : ''
+                        : agregadoId === producto.id ? '¡Agregado! ✓' : 'Agregar'
+                      }
                     </button>
                   </div>
                 </div>
