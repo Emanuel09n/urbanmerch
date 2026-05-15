@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
-import { FiTrash2, FiArrowLeft, FiShoppingBag, FiTag } from 'react-icons/fi'
+import { FiTrash2, FiArrowLeft, FiShoppingBag, FiTag, FiMapPin, FiPhone, FiUser } from 'react-icons/fi'
 
 export default function Carrito() {
   const { carrito, eliminar, vaciar, total } = useCart()
@@ -14,12 +14,21 @@ export default function Carrito() {
   const [cuponError, setCuponError] = useState('')
   const [loadingCupon, setLoadingCupon] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [envio, setEnvio] = useState({
+    nombre: '', direccion: '', ciudad: '', telefono: ''
+  })
+  const [envioError, setEnvioError] = useState('')
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  // Prellenar nombre si está logueado
+  useEffect(() => {
+    if (usuario) setEnvio(prev => ({ ...prev, nombre: usuario.nombre }))
+  }, [usuario])
 
   const totalFinal = cuponAplicado ? cuponAplicado.total_final : total
   const descuento = cuponAplicado ? cuponAplicado.descuento : 0
@@ -42,6 +51,15 @@ export default function Carrito() {
 
   const handlePagar = async () => {
     if (!usuario) { navigate('/login'); return }
+
+    // Validar envío
+    if (!envio.nombre || !envio.direccion || !envio.ciudad || !envio.telefono) {
+      setEnvioError('Por favor completa todos los datos de envío')
+      document.getElementById('form-envio').scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    setEnvioError('')
+
     try {
       if (cuponAplicado) {
         await axios.post('https://urbanmerch-production.up.railway.app/api/cupones/usar', { codigo: cuponAplicado.codigo })
@@ -50,7 +68,11 @@ export default function Carrito() {
         productos: carrito.map(p => ({
           id: p.id, nombre: p.nombre, cantidad: p.cantidad, precio: p.precio
         })),
-        usuario: { email: usuario.email },
+        usuario: {
+          email: usuario.email,
+          nombre: envio.nombre
+        },
+        envio,
         descuento: descuento
       })
       window.location.href = res.data.init_point
@@ -73,7 +95,7 @@ export default function Carrito() {
         </h2>
         <p style={{ color: '#888', marginBottom: '32px', fontSize: '14px', textAlign: 'center' }}>
           Agrega productos para continuar
-        </p>
+        p>
         <Link to="/catalogo" style={{
           background: '#0a0a0a', color: '#fff', padding: '14px 36px',
           borderRadius: '10px', fontSize: '13px', fontWeight: '700',
@@ -111,8 +133,10 @@ export default function Carrito() {
           gap: '24px'
         }}>
 
-          {/* PRODUCTOS */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* IZQUIERDA — PRODUCTOS + FORMULARIO ENVÍO */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            {/* PRODUCTOS */}
             {carrito.map(item => (
               <div key={item.id} style={{
                 background: '#fff', borderRadius: '16px',
@@ -159,6 +183,126 @@ export default function Carrito() {
                 </div>
               </div>
             ))}
+
+            {/* FORMULARIO DE ENVÍO */}
+            <div id="form-envio" style={{
+              background: '#fff', borderRadius: '16px',
+              padding: isMobile ? '20px' : '28px'
+            }}>
+              <h2 style={{
+                fontSize: '18px', fontWeight: '800',
+                marginBottom: '20px', letterSpacing: '-0.5px',
+                display: 'flex', alignItems: 'center', gap: '8px'
+              }}>
+                <FiMapPin size={20} /> Datos de envío
+              </h2>
+
+              {envioError && (
+                <div style={{
+                  background: '#fff0f0', border: '1px solid #ffcccc',
+                  borderRadius: '8px', padding: '12px 16px',
+                  color: '#cc0000', fontSize: '13px', marginBottom: '16px'
+                }}>❌ {envioError}</div>
+              )}
+
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
+                {/* NOMBRE */}
+                <div>
+                  <label style={{
+                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#333', display: 'flex',
+                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                  }}>
+                    <FiUser size={12} /> Nombre completo
+                  </label>
+                  <input
+                    type="text" placeholder="Tu nombre completo"
+                    value={envio.nombre}
+                    onChange={e => setEnvio({ ...envio, nombre: e.target.value })}
+                    style={{
+                      width: '100%', padding: '12px 14px',
+                      border: '1.5px solid #e0e0e0', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', fontFamily: 'inherit',
+                      boxSizing: 'border-box', transition: 'border 0.2s'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#000'}
+                    onBlur={e => e.target.style.borderColor = '#e0e0e0'}
+                  />
+                </div>
+
+                {/* TELÉFONO */}
+                <div>
+                  <label style={{
+                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#333', display: 'flex',
+                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                  }}>
+                    <FiPhone size={12} /> Teléfono
+                  </label>
+                  <input
+                    type="tel" placeholder="300 000 0000"
+                    value={envio.telefono}
+                    onChange={e => setEnvio({ ...envio, telefono: e.target.value })}
+                    style={{
+                      width: '100%', padding: '12px 14px',
+                      border: '1.5px solid #e0e0e0', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', fontFamily: 'inherit',
+                      boxSizing: 'border-box', transition: 'border 0.2s'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#000'}
+                    onBlur={e => e.target.style.borderColor = '#e0e0e0'}
+                  />
+                </div>
+
+                {/* CIUDAD */}
+                <div>
+                  <label style={{
+                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#333', display: 'flex',
+                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                  }}>
+                    <FiMapPin size={12} /> Ciudad
+                  </label>
+                  <input
+                    type="text" placeholder="Tu ciudad"
+                    value={envio.ciudad}
+                    onChange={e => setEnvio({ ...envio, ciudad: e.target.value })}
+                    style={{
+                      width: '100%', padding: '12px 14px',
+                      border: '1.5px solid #e0e0e0', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', fontFamily: 'inherit',
+                      boxSizing: 'border-box', transition: 'border 0.2s'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#000'}
+                    onBlur={e => e.target.style.borderColor = '#e0e0e0'}
+                  />
+                </div>
+
+                {/* DIRECCIÓN */}
+                <div>
+                  <label style={{
+                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#333', display: 'flex',
+                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                  }}>
+                    <FiMapPin size={12} /> Dirección
+                  </label>
+                  <input
+                    type="text" placeholder="Calle 00 # 00-00"
+                    value={envio.direccion}
+                    onChange={e => setEnvio({ ...envio, direccion: e.target.value })}
+                    style={{
+                      width: '100%', padding: '12px 14px',
+                      border: '1.5px solid #e0e0e0', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', fontFamily: 'inherit',
+                      boxSizing: 'border-box', transition: 'border 0.2s'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#000'}
+                    onBlur={e => e.target.style.borderColor = '#e0e0e0'}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* RESUMEN */}
@@ -263,6 +407,20 @@ export default function Carrito() {
                 ${Number(totalFinal).toLocaleString('es-CO')}
               </span>
             </div>
+
+            {/* RESUMEN ENVÍO */}
+            {envio.direccion && (
+              <div style={{
+                background: '#f8f8f8', borderRadius: '10px',
+                padding: '12px 16px', marginBottom: '16px',
+                fontSize: '13px', color: '#666'
+              }}>
+                <p style={{ fontWeight: '700', color: '#333', marginBottom: '4px' }}>📦 Enviar a:</p>
+                <p>{envio.nombre}</p>
+                <p>{envio.direccion}, {envio.ciudad}</p>
+                <p>{envio.telefono}</p>
+              </div>
+            )}
 
             <button onClick={handlePagar} style={{
               width: '100%', padding: '16px', background: '#0a0a0a', color: '#fff',
