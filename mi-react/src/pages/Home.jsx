@@ -526,7 +526,14 @@ export default function Home() {
             ))}
 
             <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '20px' }}>Escríbenos</h3>
-            <form onSubmit={e => { e.preventDefault(); alert('¡Mensaje enviado!') }}>
+            <form onSubmit={e => {
+              e.preventDefault()
+              const nombre = e.target[0].value
+              const email = e.target[1].value
+              const mensaje = e.target[2].value
+              const texto = `Hola URBANMERCH! 👋%0ASoy *${nombre}* (${email})%0A%0A${mensaje}`
+              window.open(`https://wa.me/573208665793?text=${texto}`, '_blank')
+            }}>
               {[
                 { placeholder: 'Tu nombre', type: 'text' },
                 { placeholder: 'Tu email', type: 'email' },
