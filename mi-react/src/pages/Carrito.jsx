@@ -25,9 +25,8 @@ export default function Carrito() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Prellenar nombre si está logueado
   useEffect(() => {
-    if (usuario) setEnvio(prev => ({ ...prev, nombre: usuario.nombre }))
+    if (usuario) setEnvio(e => ({ ...e, nombre: usuario.nombre || '' }))
   }, [usuario])
 
   const totalFinal = cuponAplicado ? cuponAplicado.total_final : total
@@ -52,10 +51,10 @@ export default function Carrito() {
   const handlePagar = async () => {
     if (!usuario) { navigate('/login'); return }
 
-    // Validar envío
-    if (!envio.nombre || !envio.direccion || !envio.ciudad || !envio.telefono) {
+    // Validar datos de envío
+    if (!envio.nombre.trim() || !envio.direccion.trim() || !envio.ciudad.trim() || !envio.telefono.trim()) {
       setEnvioError('Por favor completa todos los datos de envío')
-      document.getElementById('form-envio').scrollIntoView({ behavior: 'smooth' })
+      document.getElementById('formulario-envio').scrollIntoView({ behavior: 'smooth' })
       return
     }
     setEnvioError('')
@@ -72,7 +71,7 @@ export default function Carrito() {
           email: usuario.email,
           nombre: envio.nombre
         },
-        envio,
+        envio: envio,
         descuento: descuento
       })
       window.location.href = res.data.init_point
@@ -95,7 +94,7 @@ export default function Carrito() {
         </h2>
         <p style={{ color: '#888', marginBottom: '32px', fontSize: '14px', textAlign: 'center' }}>
           Agrega productos para continuar
-        p>
+        </p>
         <Link to="/catalogo" style={{
           background: '#0a0a0a', color: '#fff', padding: '14px 36px',
           borderRadius: '10px', fontSize: '13px', fontWeight: '700',
@@ -134,7 +133,7 @@ export default function Carrito() {
         }}>
 
           {/* IZQUIERDA — PRODUCTOS + FORMULARIO ENVÍO */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
             {/* PRODUCTOS */}
             {carrito.map(item => (
@@ -185,35 +184,41 @@ export default function Carrito() {
             ))}
 
             {/* FORMULARIO DE ENVÍO */}
-            <div id="form-envio" style={{
+            <div id="formulario-envio" style={{
               background: '#fff', borderRadius: '16px',
-              padding: isMobile ? '20px' : '28px'
+              padding: isMobile ? '20px' : '28px',
+              marginTop: '8px'
             }}>
               <h2 style={{
-                fontSize: '18px', fontWeight: '800',
+                fontSize: '16px', fontWeight: '800',
                 marginBottom: '20px', letterSpacing: '-0.5px',
                 display: 'flex', alignItems: 'center', gap: '8px'
               }}>
-                <FiMapPin size={20} /> Datos de envío
+                <FiMapPin size={18} /> Datos de envío
               </h2>
 
               {envioError && (
                 <div style={{
                   background: '#fff0f0', border: '1px solid #ffcccc',
-                  borderRadius: '8px', padding: '12px 16px',
+                  borderRadius: '8px', padding: '10px 14px',
                   color: '#cc0000', fontSize: '13px', marginBottom: '16px'
-                }}>❌ {envioError}</div>
+                }}>⚠️ {envioError}</div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                gap: '12px'
+              }}>
                 {/* NOMBRE */}
                 <div>
                   <label style={{
-                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
-                    textTransform: 'uppercase', color: '#333', display: 'flex',
-                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                    fontSize: '11px', fontWeight: '600', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#555',
+                    display: 'block', marginBottom: '6px'
                   }}>
-                    <FiUser size={12} /> Nombre completo
+                    <FiUser size={12} style={{ marginRight: '4px' }} />
+                    Nombre completo
                   </label>
                   <input
                     type="text" placeholder="Tu nombre completo"
@@ -233,11 +238,12 @@ export default function Carrito() {
                 {/* TELÉFONO */}
                 <div>
                   <label style={{
-                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
-                    textTransform: 'uppercase', color: '#333', display: 'flex',
-                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                    fontSize: '11px', fontWeight: '600', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#555',
+                    display: 'block', marginBottom: '6px'
                   }}>
-                    <FiPhone size={12} /> Teléfono
+                    <FiPhone size={12} style={{ marginRight: '4px' }} />
+                    Teléfono
                   </label>
                   <input
                     type="tel" placeholder="300 000 0000"
@@ -257,14 +263,15 @@ export default function Carrito() {
                 {/* CIUDAD */}
                 <div>
                   <label style={{
-                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
-                    textTransform: 'uppercase', color: '#333', display: 'flex',
-                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                    fontSize: '11px', fontWeight: '600', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#555',
+                    display: 'block', marginBottom: '6px'
                   }}>
-                    <FiMapPin size={12} /> Ciudad
+                    <FiMapPin size={12} style={{ marginRight: '4px' }} />
+                    Ciudad
                   </label>
                   <input
-                    type="text" placeholder="Tu ciudad"
+                    type="text" placeholder="Bogotá, Medellín..."
                     value={envio.ciudad}
                     onChange={e => setEnvio({ ...envio, ciudad: e.target.value })}
                     style={{
@@ -281,14 +288,15 @@ export default function Carrito() {
                 {/* DIRECCIÓN */}
                 <div>
                   <label style={{
-                    fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
-                    textTransform: 'uppercase', color: '#333', display: 'flex',
-                    alignItems: 'center', gap: '6px', marginBottom: '8px'
+                    fontSize: '11px', fontWeight: '600', letterSpacing: '1px',
+                    textTransform: 'uppercase', color: '#555',
+                    display: 'block', marginBottom: '6px'
                   }}>
-                    <FiMapPin size={12} /> Dirección
+                    <FiMapPin size={12} style={{ marginRight: '4px' }} />
+                    Dirección
                   </label>
                   <input
-                    type="text" placeholder="Calle 00 # 00-00"
+                    type="text" placeholder="Calle 123 #45-67"
                     value={envio.direccion}
                     onChange={e => setEnvio({ ...envio, direccion: e.target.value })}
                     style={{
@@ -409,7 +417,7 @@ export default function Carrito() {
             </div>
 
             {/* RESUMEN ENVÍO */}
-            {envio.direccion && (
+            {envio.direccion && envio.ciudad && (
               <div style={{
                 background: '#f8f8f8', borderRadius: '10px',
                 padding: '12px 16px', marginBottom: '16px',
@@ -427,7 +435,9 @@ export default function Carrito() {
               fontSize: '13px', fontWeight: '700', letterSpacing: '2px',
               textTransform: 'uppercase', borderRadius: '10px',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-            }}>
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = '#333'}
+              onMouseLeave={e => e.currentTarget.style.background = '#0a0a0a'}>
               <FiShoppingBag size={17} /> Pagar ahora
             </button>
 
